@@ -1,31 +1,13 @@
 [build]
-
-This setting tells Netlify where to look for the serverless functions.
-
 functions = "netlify/functions"
-
-Since index.html is in the root, the publish directory is the root.
-
 publish = "."
 
-This section sets configuration for the functions runtime.
-
 [functions]
-
-We use esbuild, which is a faster and more reliable bundler.
-
 node_bundler = "esbuild"
-
-This ensures the 'node-fetch' library is bundled if needed, though for a proxy it's often automatic.
-
 external_node_modules = ["node-fetch"]
-
-CRITICAL REDIRECT: This is the rule that intercepts the browser's request
-
-to the /api/ai-proxy endpoint and securely redirects it to your function.
 
 [[redirects]]
 from = "/api/ai-proxy"
 to = "/.netlify/functions/ai-proxy"
 status = 200
-force = true # Forces the function to be used even if a file with that name exists
+force = true
