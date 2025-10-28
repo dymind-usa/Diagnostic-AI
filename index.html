@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 诊断检测专家系统</title>
+    <title>AI 诊断辅助系统</title>
     <!-- 引入 Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,12 +24,11 @@
     <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
         <!-- Header and Language Selector -->
         <header class="mb-8 border-b pb-4 flex justify-between items-center">
-            <!-- 1. Patient Information Input -> Patient Data Input -->
-            <h1 class="text-3xl font-bold text-gray-800" data-i18n="appTitle">AI 诊断检测专家系统</h1>
+            <h1 class="text-3xl font-bold text-gray-800" data-i18n="appTitle">AI Diagnostic Assistant</h1>
             
             <!-- Language Selector -->
             <div class="flex items-center space-x-2">
-                <label for="language-select" class="text-sm font-medium text-gray-600" data-i18n="languageLabel">语言:</label>
+                <label for="language-select" class="text-sm font-medium text-gray-600" data-i18n="languageLabel">Language:</label>
                 <select id="language-select" class="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
                     <option value="zh">中文 (Chinese)</option>
                     <option value="en">English</option>
@@ -40,61 +39,60 @@
 
         <!-- Input Section -->
         <section id="input-section" class="mb-8 p-6 bg-indigo-50 rounded-lg border border-indigo-200">
-            <!-- 1. Patient Information Input -> Patient Data Input -->
-            <h2 class="text-2xl font-semibold mb-4 text-indigo-800" data-i18n="inputSectionTitle">患者数据输入</h2>
+            <h2 class="text-2xl font-semibold mb-4 text-indigo-800" data-i18n="inputSectionTitle">Patient Information Input</h2>
             
-            <!-- 2. Demo Cases -> Case Studies -->
+            <!-- Demo Case Buttons -->
             <div class="mb-6">
-                <h3 class="text-lg font-medium text-indigo-700 mb-2" data-i18n="demoCasesTitle">案例研究:</h3>
+                <h3 class="text-lg font-medium text-indigo-700 mb-2" data-i18n="demoCasesTitle">Demo Cases:</h3>
                 <div id="demo-buttons" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case1" data-i18n="case1Button" onclick="loadDemoCase('case1')">案例 1</button>
-                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case2" data-i18n="case2Button" onclick="loadDemoCase('case2')">案例 2</button>
-                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case3" data-i18n="case3Button" onclick="loadDemoCase('case3')">案例 3</button>
+                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case1" data-i18n="case1Button" onclick="loadDemoCase('case1')">Case 1</button>
+                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case2" data-i18n="case2Button" onclick="loadDemoCase('case2')">Case 2</button>
+                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case3" data-i18n="case3Button" onclick="loadDemoCase('case3')">Case 3</button>
                 </div>
             </div>
 
-            <!-- 3. Department/Other information -> Department/Additional information -->
+            <!-- Department/Other information Input (Updated Label) -->
             <div class="mb-4">
-                <label for="department" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="departmentLabel">科室/附加信息:</label>
+                <label for="department" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="departmentLabel">Department/Other information:</label>
                 <input type="text" id="department" placeholder="e.g., Cardiology / History of diabetes, 内科 / 长期素食" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
             </div>
 
-            <!-- 4. Symptoms/Patient complaint -> Patient symptoms/signs/statements -->
+            <!-- Symptoms/Patent complaint Input (Updated Label) -->
             <div class="mb-4">
-                <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="symptomsLabel">患者症状/体征/主诉:</label>
+                <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="symptomsLabel">Symptoms/Patient complaint:</label>
                 <textarea id="symptoms" rows="4" placeholder="e.g., Fever for 3 days, cough with phlegm, 持续发烧，乏力" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"></textarea>
             </div>
 
-            <!-- 5. Existing Test Results/History -> Clinical History and test results -->
+            <!-- Existing Test Results/History Input (Updated Label) -->
             <div class="mb-6">
-                <label for="test-results" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="testResultsLabel">临床病史和检测结果:</label>
+                <label for="test-results" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="testResultsLabel">Existing Test Results/History:</label>
                 <textarea id="test-results" rows="3" placeholder="e.g., CRP 50 mg/L, WBC 15.2 x 10^9/L, 血常规，过敏史" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"></textarea>
             </div>
             
-            <button id="analyze-button" class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200 shadow-md" onclick="runAnalysis()" data-i18n="analyzeButton">运行 AI 分析</button>
+            <button id="analyze-button" class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200 shadow-md" onclick="runAnalysis()" data-i18n="analyzeButton">Run AI Analysis</button>
         </section>
 
         <!-- Output/Results Section -->
         <section id="output-section" class="p-6 bg-white rounded-lg border border-gray-300">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800" data-i18n="outputSectionTitle">AI 分析与建议</h2>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800" data-i18n="outputSectionTitle">AI Analysis and Recommendations</h2>
 
             <!-- Loading Indicator -->
             <div id="loading" class="hidden text-center p-4">
                 <div class="animate-spin inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
-                <p class="mt-2 text-indigo-600 font-medium" data-i18n="loadingMessage">正在分析复杂的医疗数据...</p>
+                <p class="mt-2 text-indigo-600 font-medium" data-i18n="loadingMessage">Analyzing complex medical data...</p>
             </div>
 
             <!-- Results Display -->
             <div id="results-display" class="space-y-6 hidden">
                 <!-- Medical Analysis Card -->
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h3 class="text-xl font-medium text-gray-700 mb-2 border-b pb-1" data-i18n="medicalAnalysisTitle">医学分析:</h3>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2 border-b pb-1" data-i18n="medicalAnalysisTitle">Medical Analysis:</h3>
                     <p id="medical-analysis-content" class="text-gray-600 whitespace-pre-line">...</p>
                 </div>
 
                 <!-- IVD Recommendations Card -->
                 <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                    <h3 class="text-xl font-medium text-yellow-800 mb-2 border-b pb-1" data-i18n="ivdRecommendationsTitle">建议的 IVD 检测项目:</h3>
+                    <h3 class="text-xl font-medium text-yellow-800 mb-2 border-b pb-1" data-i18n="ivdRecommendationsTitle">Suggested IVD Tests:</h3>
                     <ul id="ivd-recommendations-list" class="list-disc list-inside text-yellow-700 space-y-1 pl-4">
                         <li>...</li>
                     </ul>
@@ -102,18 +100,18 @@
 
                 <!-- Disclaimer -->
                 <p class="text-sm text-red-500 mt-4 p-3 bg-red-100 rounded-lg" data-i18n="disclaimer">
-                    免责声明：这是一个AI诊断辅助工具，不应取代专业的医学判断。请咨询合格医师以获得最终诊断和治疗决定。
+                    Disclaimer: This is an AI diagnostic aid and should not replace professional medical judgment. Consult a qualified physician for final diagnosis and treatment decisions.
                 </p>
             </div>
 
             <!-- No Results Placeholder -->
             <p id="no-results" class="text-gray-500 p-4 text-center" data-i18n="noResultsMessage">
-                请输入患者数据并点击“运行 AI 分析”以查看结果。
+                Please enter patient information and click "Run AI Analysis" to view results.
             </p>
 
             <!-- Error Message Box -->
             <div id="error-box" class="hidden p-4 mt-4 bg-red-100 border border-red-400 text-red-700 rounded-lg" role="alert">
-                <p data-i18n="errorMessagePrefix">错误: </p>
+                <p data-i18n="errorMessagePrefix">Error: </p>
                 <p id="error-message-content" class="font-medium"></p>
             </div>
         </section>
@@ -123,39 +121,36 @@
         // --- Multilingual Dictionary (i18n) ---
         const translations = {
             appTitle: {
-                en: "AI Diagnostic Test Expert System",
-                zh: "AI 诊断检测专家系统",
-                es: "Sistema Experto de Diagnóstico por IA"
+                en: "AI Diagnostic Assistant",
+                zh: "AI 诊断辅助系统",
+                es: "Asistente de Diagnóstico por IA"
             },
             languageLabel: {
                 en: "Language:",
                 zh: "语言:",
                 es: "Idioma:"
             },
-            // 1. Patient Information Input -> Patient Data Input
             inputSectionTitle: {
-                en: "Patient Data Input",
-                zh: "患者数据输入",
-                es: "Entrada de Datos del Paciente"
+                en: "Patient Information Input",
+                zh: "患者信息输入",
+                es: "Entrada de Información del Paciente"
             },
             
-            // 3. Department/Other information -> Department/Additional information
+            // UPDATED LABELS
             departmentLabel: { 
-                en: "Department/Additional information:",
-                zh: "科室/附加信息:",
-                es: "Departamento/Información Adicional:"
+                en: "Department/Other information:",
+                zh: "科室/其他信息:",
+                es: "Departamento/Otra información:"
             },
-            // 4. Symptoms/Patient complaint -> Patient symptoms/signs/statements
             symptomsLabel: {
-                en: "Patient symptoms/signs/statements:",
-                zh: "患者症状/体征/主诉:",
-                es: "Síntomas/Signos/Declaraciones del Paciente:"
+                en: "Symptoms/Patient complaint:", // Updated from Chief Complaint
+                zh: "症状/患者主诉:",
+                es: "Síntomas/Queja del Paciente:"
             },
-            // 5. Existing Test Results/History -> Clinical History and test results
-            testResultsLabel: { 
-                en: "Clinical History and test results:",
-                zh: "临床病史和检测结果:",
-                es: "Historial Clínico y resultados de pruebas:"
+            testResultsLabel: { // Label unchanged, but keeping key reference
+                en: "Existing Test Results/History:",
+                zh: "现有检测结果/病史:",
+                es: "Resultados de Pruebas/Historia:"
             },
             
             analyzeButton: {
@@ -189,9 +184,9 @@
                 es: "Descargo de responsabilidad: Esta es una ayuda diagnóstica de IA y no debe reemplazar el juicio médico profesional. Consulte a un médico calificado para el diagnóstico y las decisiones de tratamiento finales."
             },
             noResultsMessage: {
-                en: "Please enter patient data and click \"Run AI Analysis\" to view results.",
-                zh: "请输入患者数据并点击“运行 AI 分析”以查看结果。",
-                es: "Por favor, introduzca los datos del paciente y haga clic en \"Ejecutar Análisis de IA\" para ver los resultados."
+                en: "Please enter patient information and click \"Run AI Analysis\" to view results.",
+                zh: "请输入患者信息并点击“运行 AI 分析”以查看结果。",
+                es: "Por favor, introduzca la información del paciente y haga clic en \"Ejecutar Análisis de IA\" para ver los resultados."
             },
             errorMessagePrefix: {
                 en: "Error: ",
@@ -199,9 +194,9 @@
                 es: "Error: "
             },
             emptyInputError: {
-                en: "Please provide either symptoms or clinical history/test results to start the analysis.",
-                zh: "请输入症状或临床病史/现有检测结果以开始分析。",
-                es: "Por favor, proporcione síntomas o historial clínico/resultados de pruebas para iniciar el análisis."
+                en: "Please provide either symptoms or existing test results to start the analysis.",
+                zh: "请输入症状或现有检测结果以开始分析。",
+                es: "Por favor, proporcione síntomas o resultados de pruebas existentes para iniciar el análisis."
             },
             apiError: {
                 en: "AI analysis failed. Please check the inputs or try again later.",
@@ -209,15 +204,15 @@
                 es: "El análisis de IA falló. Por favor, revise las entradas o inténtelo de nuevo más tarde."
             },
             apiKeyError: {
-                en: "API Key is missing or invalid. Please check your OpenAI API key.",
-                zh: "API 密钥缺失或无效。请检查您的 OpenAI API 密钥。",
-                es: "La clave API falta o no es válida. Por favor, revise su clave API de OpenAI."
+                en: "Server Key missing or invalid. Please check the Netlify Environment Variable setup.",
+                zh: "服务器密钥缺失或无效。请检查 Netlify 环境变量设置。",
+                es: "Falta o no es válida la clave del servidor. Por favor, revise la configuración de la Variable de Entorno de Netlify."
             },
-            // 2. Demo Cases -> Case Studies
+            // NEW DEMO CASE TRANSLATIONS
             demoCasesTitle: {
-                en: "Case Studies:",
-                zh: "案例研究:",
-                es: "Estudios de Caso:"
+                en: "Demo Cases:",
+                zh: "演示案例:",
+                es: "Casos de Demostración:"
             },
             case1Button: {
                 en: "Case 1: Anemia",
@@ -236,7 +231,7 @@
             }
         };
 
-        // --- Demo Case Data (No change to data values, only labels above) ---
+        // --- Demo Case Data ---
         const demoCases = {
             case1: {
                 zh: {
@@ -304,11 +299,11 @@
         let currentLang = 'zh'; // Default language
         let lastLoadedCaseKey = null; // New: Tracks the last loaded demo case key
         
-        // IMPORTANT: Replace the empty string below with your actual ChatGPT/OpenAI API Key
-        // IMPORTANT: 请将下面的空字符串替换为您的实际 ChatGPT/OpenAI API 密钥
-        const apiKey = "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"; 
-        const apiUrl = "https://api.openai.com/v1/chat/completions";
-        const openAIModel = "gpt-4o-mini"; // Using a modern model that supports JSON output reliably
+        // --- PROXY SETUP ---
+        // The API Key has been REMOVED from the client-side for security.
+        // It is now securely stored in Netlify Environment Variables.
+        // We now call the Netlify Serverless Function endpoint:
+        const apiUrl = "/api/ai-proxy"; 
 
         /**
          * Retries a fetch request with exponential backoff.
@@ -457,7 +452,7 @@
         }
         
         /**
-         * Main function to perform AI analysis via OpenAI API.
+         * Main function to perform AI analysis via the Netlify Proxy Function.
          */
         async function runAnalysis() {
             // Reset the demo tracking key when analysis starts (as inputs might have been modified)
@@ -479,60 +474,44 @@
                 return;
             }
 
-            if (!apiKey) {
-                showError('apiKeyError');
-                return;
-            }
+            // NOTE: The API key check is REMOVED from client side as it is now secure.
             
             loading.classList.remove('hidden');
             analyzeButton.disabled = true;
 
-            // 2. Construct Prompt and Payload (OpenAI format)
-            const systemPrompt = `Act as a highly experienced medical diagnostic assistant. Your task is to provide a concise medical analysis and a list of 3 to 5 essential In-Vitro Diagnostic (IVD) tests based on the patient information provided. The output MUST be in the language requested by the user. Do not include disclaimers or any text outside of the JSON object. You MUST respond only with a JSON object that strictly follows this schema: {"medical_analysis": "...", "suggested_ivd_tests": ["...", "..."]}.`;
-
-            const userQuery = `Patient Data to analyze:
-- Department/Other Information: ${department || 'Not specified'}
-- Symptoms/Patient Complaint: ${symptoms}
-- Existing Test Results/History: ${results || 'None'}
-- Response Language: ${currentLang}
-`;
-            
-            const payload = {
-                model: openAIModel,
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userQuery }
-                ],
-                response_format: { type: "json_object" }
+            // 2. Construct Payload for the Netlify Proxy
+            // The proxy function (ai-proxy.js) handles constructing the OpenAI prompt 
+            // and injecting the API key securely.
+            const clientPayload = {
+                department: department,
+                symptoms: symptoms,
+                results: results,
+                language: currentLang
             };
-
+            
+            // The proxy requires a token for basic security access control.
             const fetchOptions = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Use the OpenAI key as a Bearer token
-                    'Authorization': `Bearer ${apiKey}`
+                    // The proxy function (ai-proxy.js) expects this header for a basic validation check!
+                    'X-Access-Token': 'token-my-secure-app' 
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(clientPayload)
             };
             
-            // 3. Execute API Call
+            // 3. Execute API Call to Netlify Proxy
             try {
                 const response = await fetchWithRetry(apiUrl, fetchOptions);
                 
-                const result = await response.json();
+                // The proxy returns the final JSON directly.
+                const parsedJson = await response.json(); 
                 
-                // Extraction logic for OpenAI response: choices[0].message.content
-                const jsonText = result.choices?.[0]?.message?.content;
-
-                if (!jsonText) {
-                    // Check for potential API error message in the result object
-                    const apiError = result.error?.message || "Empty or invalid response from AI model.";
-                    throw new Error(apiError);
+                // If the proxy itself returned an error (status 4xx or 5xx), the JSON will contain an 'error' field
+                if (response.status !== 200 || parsedJson.error) {
+                    const errorMessage = parsedJson.details || parsedJson.error || 'Server error or invalid response from proxy.';
+                    throw new Error(errorMessage);
                 }
-
-                // Parse the structured JSON response
-                const parsedJson = JSON.parse(jsonText);
                 
                 const medicalAnalysisText = parsedJson.medical_analysis;
                 const ivdRecommendations = parsedJson.suggested_ivd_tests;

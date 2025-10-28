@@ -1,0 +1,19 @@
+[build]
+
+We don't have a traditional build process, but we need to tell Netlify where to find our functions
+
+functions = netlifyfunctions
+publish = .
+
+[functions]
+node_bundler = esbuild
+external_node_modules = [node-fetch]
+
+This redirect is crucial! It maps the client-side call to the serverless function.
+
+When the browser calls apiai-proxy, Netlify sends the request to the function netlifyfunctionsai-proxy.js
+
+[[redirects]]
+from = apiai-proxy
+to = .netlifyfunctionsai-proxy
+status = 200
