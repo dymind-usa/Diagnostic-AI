@@ -1,0 +1,12 @@
+{
+  "name": "ai-proxy-project",
+  "version": "1.0.0",
+  "description": "Vercel serverless function to proxy requests to the Gemini API.",
+  "main": "api/ai-proxy.js",
+  "scripts": {
+    "start": "echo 'Run this project via Vercel deployment.'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
