@@ -44,26 +44,60 @@ module.exports = async (req, res) => {
 
     try {
         // ----------------------------------------------------
-        // 2. Process Frontend Request
+        // 2. Process Frontend Request (Receives raw patient data)
         // ----------------------------------------------------
         
-        // Vercel generally parses JSON bodies automatically
-        const { model, messages, response_format } = req.body; 
+        // Frontend sends: department, symptoms, results, language
+        const { department, symptoms, results, language } = req.body; 
 
-        if (!model || !messages || !response_format) {
-            res.status(400).json({ error: 'Bad Request: Missing required fields (model, messages, or response_format).' });
+        if (!symptoms && !results) {
+            res.status(400).json({ error: 'Bad Request: Symptoms or test results are required.' });
             return;
         }
+
+        // --- System Prompt Setup (Instructs the AI and defines the JSON output) ---
+        // This schema ensures the AI returns structured data for the frontend to easily display.
+        const outputSchema = {
+            type: "object",
+            properties: {
+                medical_analysis: {
+                    type: "string",
+                    description: `Detailed medical analysis and preliminary differential diagnosis based on the provided data, written in ${language}.`
+                },
+                suggested_ivd_tests: {
+                    type: "array",
+                    description: `A list of 3-5 necessary In Vitro Diagnostic (IVD) tests to confirm the diagnosis, written in ${language}.`
+                }
+            },
+            required: ["medical_analysis", "suggested_ivd_tests"]
+        };
+        
+        const systemPrompt = `You are an expert AI diagnostic assistant specializing in laboratory and IVD analysis. 
+        Your task is to analyze patient data and provide a medical analysis and suggested IVD tests.
+        You MUST respond only with a single JSON object that conforms strictly to the provided JSON schema.
+        The response MUST be written in the language specified: ${language}.
+        
+        Input Data Summary:
+        - Department/Additional Info: ${department}
+        - Symptoms/Complaints: ${symptoms}
+        - Clinical History/Test Results: ${results}`;
+
+        // --- Final OpenAI Payload Construction ---
+        const modelToUse = "gpt-4-turbo-preview"; // Using a modern model capable of JSON mode
+        
+        const payload = {
+            model: modelToUse,
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: "Please perform the medical analysis and generate the IVD test recommendations now based on the summarized input data." }
+            ],
+            // Request JSON mode for guaranteed structured output
+            response_format: { type: "json_object" }
+        };
         
         // ----------------------------------------------------
         // 3. Call OpenAI API
         // ----------------------------------------------------
-
-        const payload = {
-            model: model,
-            messages: messages,
-            response_format: response_format
-        };
 
         const apiResponse = await fetch(API_URL, {
             method: 'POST',
