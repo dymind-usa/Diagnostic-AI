@@ -43,13 +43,21 @@
             <!-- Medical History Input -->
             <div>
                 <label for="medical-history" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="historyLabel">Medical History, Symptoms, and Preliminary Findings:</label>
-                <textarea id="medical-history" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="e.g., Patient is a 55-year-old male presenting with severe abdominal pain, high fever (103°F), and elevated white blood cell count (18,000/µL). No history of previous abdominal surgery."></textarea>
+                <!-- MODIFICATION: rows changed from 6 to 2 -->
+                <textarea id="medical-history" rows="2" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="e.g., Patient is a 55-year-old male presenting with severe abdominal pain, high fever (103°F), and elevated white blood cell count (18,000/µL). No history of previous abdominal surgery."></textarea>
             </div>
 
             <!-- Pre-diagnosis Input -->
             <div>
                 <label for="pre-diagnosis" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="diagnosisLabel">Doctor's Pre-Diagnosis/Differential Diagnosis:</label>
                 <input type="text" id="pre-diagnosis" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="e.g., Acute appendicitis, diverticulitis, or bacterial gastroenteritis.">
+            </div>
+
+            <!-- Demo Cases -->
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button onclick="loadDemoCase('case1')" class="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-150" data-i18n="demoCase1">Load Demo Case 1: Appendicitis</button>
+                <button onclick="loadDemoCase('case2')" class="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-150" data-i18n="demoCase2">Load Demo Case 2: Myocardial Infarction</button>
+                <button onclick="loadDemoCase('case3')" class="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-150" data-i18n="demoCase3">Load Demo Case 3: Sepsis</button>
             </div>
 
             <!-- Analyze Button -->
@@ -114,7 +122,10 @@
                 analysisHeader: "Medical Analysis:",
                 ivdHeader: "IVD Recommendations (Prioritized In-Vitro Diagnostic Tests):",
                 apiError: "AI analysis failed. Please check the inputs or try again later.",
-                apiError502: "Connection Error (502). Please ensure your secure proxy is deployed and your OpenAI API Key is correctly set in Vercel's environment variables."
+                apiError502: "Connection Error (502). Please ensure your secure proxy is deployed and your OpenAI API Key is correctly set in Vercel's environment variables.",
+                demoCase1: "Load Demo Case 1: Appendicitis",
+                demoCase2: "Load Demo Case 2: Myocardial Infarction",
+                demoCase3: "Load Demo Case 3: Sepsis"
             },
             zh: {
                 appTitle: "AI 诊断辅助系统",
@@ -128,7 +139,10 @@
                 analysisHeader: "医学分析:",
                 ivdHeader: "IVD建议 (优先体外诊断检测):",
                 apiError: "AI分析失败。请检查输入或稍后重试。",
-                apiError502: "连接错误 (502)。请确保您的安全代理已部署，并且您的OpenAI API Key已在Vercel的环境变量中正确设置。"
+                apiError502: "连接错误 (502)。请确保您的安全代理已部署，并且您的OpenAI API Key已在Vercel的环境变量中正确设置。",
+                demoCase1: "加载演示案例 1: 阑尾炎",
+                demoCase2: "加载演示案例 2: 心肌梗死",
+                demoCase3: "加载演示案例 3: 败血症"
             }
         };
 
@@ -185,8 +199,34 @@
             errorElement.classList.remove('hidden');
         }
 
+        // --- 2. DEMO CASE LOADING ---
+        const demoCases = {
+            case1: { // Acute Appendicitis
+                history: "Patient is a 28-year-old female presenting with acute onset periumbilical pain that migrated to the right lower quadrant over 12 hours. Symptoms include nausea, loss of appetite, and a low-grade fever (100.5°F). Physical exam reveals rebound tenderness at McBurney's point. WBC count is 14,000/µL.",
+                preDiagnosis: "Acute Appendicitis, Ovarian Cyst Torsion, or Ectopic Pregnancy."
+            },
+            case2: { // Myocardial Infarction (Heart Attack)
+                history: "Patient is a 65-year-old male with a history of hypertension and hypercholesterolemia. He presents with crushing retrosternal chest pain radiating to the left arm and jaw, profuse sweating (diaphoresis), and shortness of breath. Symptoms started 2 hours ago. ECG shows ST-segment elevation in V3-V4.",
+                preDiagnosis: "Acute Myocardial Infarction (STEMI), Pericarditis, or Pulmonary Embolism."
+            },
+            case3: { // Sepsis
+                history: "Patient is an 80-year-old resident of a nursing home with a known urinary tract infection (UTI). Patient is lethargic, confused, hypotensive (BP 85/50 mmHg), and febrile (103.8°F). Lactic acid level is elevated at 4.5 mmol/L. Peripheral perfusion is poor.",
+                preDiagnosis: "Septic Shock secondary to UTI, Severe Dehydration, or Hypovolemic Shock."
+            }
+        };
 
-        // --- 2. API CALL AND ANALYSIS ---
+        function loadDemoCase(caseKey) {
+            const caseData = demoCases[caseKey];
+            if (caseData) {
+                document.getElementById('medical-history').value = caseData.history;
+                document.getElementById('pre-diagnosis').value = caseData.preDiagnosis;
+                // Clear previous results and errors when loading a new case
+                document.getElementById('results-display').classList.add('hidden');
+                document.getElementById('error-message').classList.add('hidden');
+            }
+        }
+
+        // --- 3. API CALL AND ANALYSIS ---
 
         async function runAnalysis() {
             const historyInput = document.getElementById('medical-history').value.trim();
@@ -293,6 +333,7 @@
             } finally {
                 // 6. Final cleanup
                 analyzeButton.disabled = false;
+                loading.classList.add('hidden');
             }
         }
 
