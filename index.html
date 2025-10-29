@@ -24,256 +24,214 @@
     <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
         <!-- Header and Language Selector -->
         <header class="mb-8 border-b pb-4 flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-800" data-i18n="appTitle">AI Diagnostic Assistant</h1>
+            <h1 class="text-3xl font-bold text-gray-800" data-i18n="appTitle">AI 诊断辅助系统</h1>
             
             <!-- Language Selector -->
             <div class="flex items-center space-x-2">
-                <label for="language-select" class="text-sm font-medium text-gray-600" data-i18n="languageLabel">Language:</label>
-                <select id="language-select" class="p-2 border border-gray-300 rounded-lg text-sm transition duration-150 ease-in-out hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span class="text-sm text-gray-600" data-i18n="selectLanguage">Select Language:</span>
+                <select id="language-selector" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                     <option value="en">English</option>
                     <option value="zh">中文 (Chinese)</option>
                 </select>
             </div>
         </header>
 
-        <!-- Input Section -->
-        <div id="input-section" class="space-y-6 mb-8">
-            <h2 class="text-2xl font-semibold text-gray-700" data-i18n="inputTitle">Patient Data Input</h2>
-            
-            <!-- Medical History Input -->
-            <div>
-                <label for="medical-history" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="historyLabel">Medical History, Symptoms, and Preliminary Findings:</label>
-                <!-- MODIFICATION: rows changed from 6 to 2 -->
-                <textarea id="medical-history" rows="2" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="e.g., Patient is a 55-year-old male presenting with severe abdominal pain, high fever (103°F), and elevated white blood cell count (18,000/µL). No history of previous abdominal surgery."></textarea>
-            </div>
+        <!-- Main Form and Input Area -->
+        <section class="mb-8">
+            <label for="medical-history" class="block text-xl font-semibold text-gray-700 mb-3" data-i18n="historyLabel">患者病史与检验结果:</label>
+            <textarea id="medical-history" rows="2" class="w-full p-4 border border-gray-300 rounded-lg shadow-inner focus:ring-blue-500 focus:border-blue-500 resize-y min-h-[100px]" 
+                      placeholder="请在此处输入详细的患者病史、症状、体征以及任何实验室或影像学检验结果...">
+            </textarea>
+            <div id="apiError" class="text-red-600 font-medium mt-3 hidden" data-i18n="apiErrorInitial"></div>
+        </section>
 
-            <!-- Pre-diagnosis Input -->
-            <div>
-                <label for="pre-diagnosis" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="diagnosisLabel">Doctor's Pre-Diagnosis/Differential Diagnosis:</label>
-                <input type="text" id="pre-diagnosis" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" placeholder="e.g., Acute appendicitis, diverticulitis, or bacterial gastroenteritis.">
+        <!-- Demo Cases -->
+        <section class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2" data-i18n="demoCasesTitle">演示案例:</h2>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="loadDemo('demo1')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors text-sm" data-i18n="demo1">案例 1: 阑尾炎</button>
+                <button onclick="loadDemo('demo2')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors text-sm" data-i18n="demo2">案例 2: 肺炎</button>
+                <button onclick="loadDemo('demo3')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors text-sm" data-i18n="demo3">案例 3: 肾结石</button>
+                <button onclick="loadDemo('demo4')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors text-sm" data-i18n="demo4">案例 4: 糖尿病</button>
             </div>
+        </section>
 
-            <!-- Demo Cases -->
-            <div class="flex flex-wrap gap-3 pt-2">
-                <button onclick="loadDemoCase('case1')" class="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-150" data-i18n="demoCase1">Load Demo Case 1: Appendicitis</button>
-                <button onclick="loadDemoCase('case2')" class="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-150" data-i18n="demoCase2">Load Demo Case 2: Myocardial Infarction</button>
-                <button onclick="loadDemoCase('case3')" class="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition duration-150" data-i18n="demoCase3">Load Demo Case 3: Sepsis</button>
-            </div>
-
-            <!-- Analyze Button -->
-            <button id="analyze-button" onclick="runAnalysis()" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-[1.01]" data-i18n="analyzeButton">
-                Run AI Analysis
+        <!-- Action Button -->
+        <div class="flex justify-center mb-8">
+            <button id="analyze-button" onclick="runAnalysis()" 
+                    class="px-12 py-3 bg-blue-600 text-white font-bold rounded-full text-lg shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105 disabled:bg-gray-400 disabled:transform-none"
+                    data-i18n="analyzeButton">
+                运行 AI 分析
             </button>
-            
-            <!-- Error Message Display -->
-            <div id="error-message" class="hidden p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg" role="alert">
-                <span id="error-content"></span>
-            </div>
         </div>
 
         <!-- Loading Spinner -->
         <div id="loading" class="hidden text-center py-10">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600 font-medium" data-i18n="loadingMessage">Analyzing data... This may take a moment.</p>
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-3 text-gray-600" data-i18n="loadingMessage">AI 正在分析数据，请稍候...</p>
         </div>
 
-        <!-- Results Display Section -->
-        <div id="results-display" class="hidden space-y-8 mt-8 border-t pt-8">
-            <h2 class="text-2xl font-semibold text-gray-700" data-i18n="resultsTitle">AI Diagnosis and IVD Recommendations</h2>
+        <!-- Results Display Area -->
+        <div id="results-display" class="hidden mt-8 p-6 border border-gray-200 rounded-lg bg-gray-50">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6 border-b pb-2" data-i18n="resultsTitle">分析结果</h2>
 
-            <!-- Medical Analysis Card -->
-            <div class="bg-gray-50 p-6 rounded-lg shadow-lg border-l-4 border-green-500">
-                <h3 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.27a11.97 11.97 0 010 17.156A11.97 11.97 0 0112 21c-2.47 0-4.85-.756-6.866-2.184l-2.121 2.121a1 1 0 01-1.414-1.414l2.121-2.121A11.97 11.97 0 013 12c0-2.47.756-4.85 2.184-6.866l-2.121-2.121a1 1 0 011.414-1.414l2.121 2.121C7.15 4.75 9.53 4 12 4c2.47 0 4.85.756 6.866 2.184l2.121-2.121a1 1 0 011.414 1.414l-2.121 2.121z" />
-                    </svg>
-                    <span data-i18n="analysisHeader">Medical Analysis:</span>
-                </h3>
-                <p id="medical-analysis-content" class="text-gray-600 leading-relaxed whitespace-pre-wrap"></p>
+            <!-- Medical Analysis Section -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-3" data-i18n="analysisSectionTitle">AI 医疗分析 (初步诊断与鉴别诊断):</h3>
+                <div id="medical-analysis-content" class="p-4 bg-white border border-gray-200 rounded-lg text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    <!-- Analysis content will be inserted here -->
+                </div>
             </div>
 
-            <!-- IVD Recommendations Card -->
-            <div class="bg-gray-50 p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
-                <h3 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-9 0V3h4v2m-4 0v2" />
-                    </svg>
-                    <span data-i18n="ivdHeader">IVD Recommendations (Prioritized In-Vitro Diagnostic Tests):</span>
-                </h3>
-                <ul id="ivd-recommendations-list" class="list-disc pl-5 text-gray-600 space-y-2">
-                    <!-- List items will be populated by JavaScript -->
+            <!-- IVD Recommendations Section -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3" data-i18n="ivdSectionTitle">体外诊断 (IVD) 检验建议:</h3>
+                <ul id="ivd-recommendations-list" class="list-disc list-inside space-y-2 p-4 bg-white border border-gray-200 rounded-lg text-gray-700">
+                    <!-- IVD recommendations will be inserted here -->
                 </ul>
             </div>
+            
+            <p class="mt-6 text-sm text-yellow-700 bg-yellow-100 p-3 rounded-lg border border-yellow-300" data-i18n="disclaimer">
+                **免责声明：** 本系统提供的分析仅供参考，不能替代专业医生的诊断。请务必咨询合格的医疗专业人员以获得准确的诊断和治疗建议。
+            </p>
         </div>
     </div>
 
     <script>
-        // --- 1. LANGUAGE AND TRANSLATION ---
+        // --- Internationalization (I18N) Dictionary ---
         const translations = {
             en: {
                 appTitle: "AI Diagnostic Assistant",
-                languageLabel: "Language:",
-                inputTitle: "Patient Data Input",
-                historyLabel: "Medical History, Symptoms, and Preliminary Findings:",
-                diagnosisLabel: "Doctor's Pre-Diagnosis/Differential Diagnosis:",
+                selectLanguage: "Select Language:",
+                historyLabel: "Patient History and Test Results:",
                 analyzeButton: "Run AI Analysis",
-                loadingMessage: "Analyzing data... This may take a moment.",
-                resultsTitle: "AI Diagnosis and IVD Recommendations",
-                analysisHeader: "Medical Analysis:",
-                ivdHeader: "IVD Recommendations (Prioritized In-Vitro Diagnostic Tests):",
-                apiError: "AI analysis failed. Please check the inputs or try again later.",
-                apiError502: "Connection Error (502). Please ensure your secure proxy is deployed and your OpenAI API Key is correctly set in Vercel's environment variables.",
-                demoCase1: "Load Demo Case 1: Appendicitis",
-                demoCase2: "Load Demo Case 2: Myocardial Infarction",
-                demoCase3: "Load Demo Case 3: Sepsis"
+                loadingMessage: "AI is analyzing data, please wait...",
+                resultsTitle: "Analysis Results",
+                analysisSectionTitle: "AI Medical Analysis (Preliminary/Differential Diagnosis):",
+                ivdSectionTitle: "In Vitro Diagnostics (IVD) Test Recommendations:",
+                disclaimer: "**Disclaimer:** The analysis provided by this system is for reference only and cannot replace professional medical diagnosis. Always consult a qualified healthcare professional for accurate diagnosis and treatment.",
+                apiErrorInitial: "AI analysis failed. Please check the inputs or try again later. (Details: API request failed with status)",
+                demoCasesTitle: "Demo Cases:",
+                demo1: "Case 1: Appendicitis",
+                demo2: "Case 2: Pneumonia",
+                demo3: "Case 3: Kidney Stones",
+                demo4: "Case 4: Diabetes",
+                historyPlaceholder: "Please enter detailed patient history, symptoms, signs, and any lab or imaging test results here..."
             },
             zh: {
                 appTitle: "AI 诊断辅助系统",
-                languageLabel: "语言:",
-                inputTitle: "患者资料输入",
-                historyLabel: "病史、症状和初步发现:",
-                diagnosisLabel: "医生初步诊断/鉴别诊断:",
-                analyzeButton: "运行AI分析",
-                loadingMessage: "正在分析数据... 请稍候。",
-                resultsTitle: "AI诊断与IVD建议",
-                analysisHeader: "医学分析:",
-                ivdHeader: "IVD建议 (优先体外诊断检测):",
-                apiError: "AI分析失败。请检查输入或稍后重试。",
-                apiError502: "连接错误 (502)。请确保您的安全代理已部署，并且您的OpenAI API Key已在Vercel的环境变量中正确设置。",
-                demoCase1: "加载演示案例 1: 阑尾炎",
-                demoCase2: "加载演示案例 2: 心肌梗死",
-                demoCase3: "加载演示案例 3: 败血症"
+                selectLanguage: "选择语言:",
+                historyLabel: "患者病史与检验结果:",
+                analyzeButton: "运行 AI 分析",
+                loadingMessage: "AI 正在分析数据，请稍候...",
+                resultsTitle: "分析结果",
+                analysisSectionTitle: "AI 医疗分析 (初步诊断与鉴别诊断):",
+                ivdSectionTitle: "体外诊断 (IVD) 检验建议:",
+                disclaimer: "**免责声明：** 本系统提供的分析仅供参考，不能替代专业医生的诊断。请务必咨询合格的医疗专业人员以获得准确的诊断和治疗建议。",
+                apiErrorInitial: "AI分析失败。请检查输入或稍后重试。（详情：API request failed with status）",
+                demoCasesTitle: "演示案例:",
+                demo1: "案例 1: 阑尾炎",
+                demo2: "案例 2: 肺炎",
+                demo3: "案例 3: 肾结石",
+                demo4: "案例 4: 糖尿病",
+                historyPlaceholder: "请在此处输入详细的患者病史、症状、体征以及任何实验室或影像学检验结果..."
             }
         };
 
-        let currentLanguage = 'en';
+        const demoData = {
+            demo1: "症状: 25岁男性，右下腹痛持续24小时，伴有恶心、呕吐，体温38.5°C。体格检查示右下腹McBurney点压痛、反跳痛。实验室检查: WCC 18,000/μL (中性粒细胞比例高)。",
+            demo2: "症状: 68岁女性，持续咳嗽、咳痰、发热三天，伴有呼吸困难。听诊右下肺可闻及湿啰音。胸片示右下肺实变影。实验室检查: CRP 120 mg/L。",
+            demo3: "症状: 40岁男性，突发剧烈右侧腰腹部绞痛，向下腹部和腹股沟放射，伴有血尿。患者自述无发热。尿液分析: 镜下血尿。",
+            demo4: "症状: 55岁女性，近三个月来多饮、多尿、体重减轻。空腹血糖 15.5 mmol/L (正常值 < 6.1)。HbA1c 9.8% (正常值 < 6.5%)。"
+        };
 
-        function applyTranslations() {
+        let currentLang = 'zh';
+
+        // --- I18N Functions ---
+        function applyTranslation(lang) {
+            currentLang = lang;
             const elements = document.querySelectorAll('[data-i18n]');
             elements.forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[currentLanguage] && translations[currentLanguage][key]) {
-                    el.textContent = translations[currentLanguage][key];
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
                 }
             });
-
-            // Update placeholders manually
-            document.getElementById('medical-history').placeholder = currentLanguage === 'zh' 
-                ? "例如: 患者为55岁男性，主诉剧烈腹痛、高烧 (39.4°C) 和白细胞计数升高 (18,000/µL)。无既往腹部手术史。" 
-                : "e.g., Patient is a 55-year-old male presenting with severe abdominal pain, high fever (103°F), and elevated white blood cell count (18,000/µL). No history of previous abdominal surgery.";
-            document.getElementById('pre-diagnosis').placeholder = currentLanguage === 'zh' 
-                ? "例如: 急性阑尾炎、憩室炎或细菌性胃肠炎。" 
-                : "e.g., Acute appendicitis, diverticulitis, or bacterial gastroenteritis.";
+            // Update placeholder text
+            document.getElementById('medical-history').placeholder = translations[lang].historyPlaceholder;
+            // Update API Error initial message if visible
+            const errorElement = document.getElementById('apiError');
+            if (errorElement.textContent === translations['en'].apiErrorInitial || errorElement.textContent === translations['zh'].apiErrorInitial) {
+                 errorElement.textContent = translations[lang].apiErrorInitial;
+            }
         }
 
         function initializeLanguage() {
-            // Set initial language from HTML or default to 'en'
-            currentLanguage = document.documentElement.lang || 'en';
-            document.getElementById('language-select').value = currentLanguage;
-            applyTranslations();
+            const selector = document.getElementById('language-selector');
+            // Set initial language based on the HTML tag
+            const initialLang = document.documentElement.lang || 'zh';
+            if (translations[initialLang]) {
+                selector.value = initialLang;
+                applyTranslation(initialLang);
+            } else {
+                applyTranslation('zh'); // Default to Chinese
+            }
 
-            document.getElementById('language-select').addEventListener('change', (e) => {
-                currentLanguage = e.target.value;
-                document.documentElement.lang = currentLanguage;
-                applyTranslations();
-                // Clear errors on language change
-                document.getElementById('error-message').classList.add('hidden');
+            selector.addEventListener('change', (e) => {
+                document.documentElement.lang = e.target.value;
+                applyTranslation(e.target.value);
             });
         }
 
-        function showError(key, details = '') {
-            const errorElement = document.getElementById('error-message');
-            const contentElement = document.getElementById('error-content');
-            
-            let message = translations[currentLanguage][key] || translations['en'][key];
-            
-            // Check for 502 error and append specific message
-            if (key === 'apiError' && details.includes('502')) {
-                message = translations[currentLanguage].apiError502 || translations['en'].apiError502;
-            } else if (key === 'apiError' && details) {
-                // For other errors, append details if available and safe
-                message += ` (Details: ${details.split(':')[0]})`;
-            }
+        // --- Utility Functions ---
 
-            contentElement.textContent = message;
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = `${translations[currentLang].apiErrorInitial.split('（详情')[0]}（详情: ${message}）`;
             errorElement.classList.remove('hidden');
         }
 
-        // --- 2. DEMO CASE LOADING ---
-        const demoCases = {
-            case1: { // Acute Appendicitis
-                history: "Patient is a 28-year-old female presenting with acute onset periumbilical pain that migrated to the right lower quadrant over 12 hours. Symptoms include nausea, loss of appetite, and a low-grade fever (100.5°F). Physical exam reveals rebound tenderness at McBurney's point. WBC count is 14,000/µL.",
-                preDiagnosis: "Acute Appendicitis, Ovarian Cyst Torsion, or Ectopic Pregnancy."
-            },
-            case2: { // Myocardial Infarction (Heart Attack)
-                history: "Patient is a 65-year-old male with a history of hypertension and hypercholesterolemia. He presents with crushing retrosternal chest pain radiating to the left arm and jaw, profuse sweating (diaphoresis), and shortness of breath. Symptoms started 2 hours ago. ECG shows ST-segment elevation in V3-V4.",
-                preDiagnosis: "Acute Myocardial Infarction (STEMI), Pericarditis, or Pulmonary Embolism."
-            },
-            case3: { // Sepsis
-                history: "Patient is an 80-year-old resident of a nursing home with a known urinary tract infection (UTI). Patient is lethargic, confused, hypotensive (BP 85/50 mmHg), and febrile (103.8°F). Lactic acid level is elevated at 4.5 mmol/L. Peripheral perfusion is poor.",
-                preDiagnosis: "Septic Shock secondary to UTI, Severe Dehydration, or Hypovolemic Shock."
-            }
-        };
-
-        function loadDemoCase(caseKey) {
-            const caseData = demoCases[caseKey];
-            if (caseData) {
-                document.getElementById('medical-history').value = caseData.history;
-                document.getElementById('pre-diagnosis').value = caseData.preDiagnosis;
-                // Clear previous results and errors when loading a new case
-                document.getElementById('results-display').classList.add('hidden');
-                document.getElementById('error-message').classList.add('hidden');
-            }
+        function hideError() {
+            document.getElementById('apiError').classList.add('hidden');
         }
 
-        // --- 3. API CALL AND ANALYSIS ---
+        function loadDemo(demoKey) {
+            const historyTextarea = document.getElementById('medical-history');
+            historyTextarea.value = demoData[demoKey];
+            hideError();
+            document.getElementById('results-display').classList.add('hidden');
+        }
+
+        // --- Main Analysis Logic (MODIFIED FOR BETTER ERROR REPORTING) ---
 
         async function runAnalysis() {
             const historyInput = document.getElementById('medical-history').value.trim();
-            const preDiagnosisInput = document.getElementById('pre-diagnosis').value.trim();
-            
             const analyzeButton = document.getElementById('analyze-button');
             const loading = document.getElementById('loading');
             const resultsDisplay = document.getElementById('results-display');
-            const errorMessage = document.getElementById('error-message');
-
-            // 0. Clear previous results and errors
+            
+            hideError();
             resultsDisplay.classList.add('hidden');
-            errorMessage.classList.add('hidden');
-            document.getElementById('medical-analysis-content').textContent = '';
-            document.getElementById('ivd-recommendations-list').innerHTML = '';
 
             if (!historyInput) {
                 showError('apiError', 'History input is required.');
                 return;
             }
 
-            // 1. Prepare UI for analysis
             analyzeButton.disabled = true;
             loading.classList.remove('hidden');
 
-            const systemPrompt = `You are a world-class AI medical consultant specializing in in-vitro diagnostics (IVD). Your task is to analyze patient data and a pre-diagnosis. 
-            You must provide a structured, two-part response in ${currentLanguage === 'zh' ? 'Chinese' : 'English'}.
-            Your response MUST be a single JSON object matching the following schema:
-            {
-                "medicalAnalysis": "A detailed, paragraph-based analysis confirming or adjusting the pre-diagnosis based on the symptoms and findings. Explain your reasoning and list possible complications.",
-                "ivdRecommendations": ["A prioritized list of 3-5 specific in-vitro diagnostic tests (e.g., 'C-reactive protein (CRP) test', 'D-dimer assay') necessary to confirm the diagnosis or rule out differential diagnoses."]
-            }`;
-            
-            const userPrompt = `
-            Patient Data/Symptoms: ${historyInput}
-            Doctor's Pre-Diagnosis/Differential Diagnosis: ${preDiagnosisInput}
-            `;
+            const systemPrompt = "你是一位经验丰富的医疗诊断辅助AI。你的任务是根据提供的患者病史、症状和检验结果，进行初步诊断、鉴别诊断，并推荐相关的体外诊断（IVD）检验项目。请以JSON格式输出，包含两个键：'medicalAnalysisText'（详细的医疗分析文本，包括初步诊断和鉴别诊断）和'ivdRecommendations'（一个推荐IVD检验项目的列表，仅包含项目名称）。请确保输出严格符合JSON格式，并且是唯一的JSON对象，不要包含任何额外的解释性文本。";
+            const userPrompt = `请对以下患者信息进行分析：\n\n${historyInput}`;
 
             try {
-                // VERCEL PATH: The request is now sent to the Vercel Serverless Function endpoint: /api/ai-proxy
-                const proxyUrl = '/api/ai-proxy';
-                
-                const response = await fetch(proxyUrl, {
+                // 1. Send request to the Vercel AI Proxy
+                const response = await fetch('/api/ai-proxy', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         messages: [
                             { role: "system", content: systemPrompt },
@@ -282,26 +240,33 @@
                     })
                 });
 
-                // 2. Handle HTTP errors from the proxy (e.g., 500, 502)
+                // --- NEW ROBUST ERROR CHECKING ---
                 if (!response.ok) {
-                    const errorDetails = await response.json().catch(() => ({ error: response.statusText }));
-                    throw new Error(`API request failed with status: ${response.status}. Details: ${errorDetails.error}`);
+                    const errorText = await response.text(); 
+                    let detailMessage = `HTTP 状态码: ${response.status}`;
+                    // Attempt to parse JSON error body for more info
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        // Try to find common error keys, otherwise fall back to raw text
+                        detailMessage += ` | 详情: ${errorJson.error || errorJson.message || errorText.substring(0, 200)}`;
+                    } catch {
+                        // If not JSON, show the raw text snippet
+                        detailMessage += ` | 详情: ${errorText.substring(0, 200)}`;
+                    }
+                    // Throw a detailed error for the catch block to handle
+                    throw new Error(detailMessage);
                 }
+                // --- END NEW ROBUST ERROR CHECKING ---
 
-                // 3. Process the AI response
+                // 2. Process response
                 const data = await response.json();
                 
-                // Extract the AI's JSON string from the response
-                const aiResponseJsonString = data.choices[0].message.content;
-                const aiResponse = JSON.parse(aiResponseJsonString);
-
-                const medicalAnalysisText = aiResponse.medicalAnalysis;
-                const ivdRecommendations = aiResponse.ivdRecommendations;
-
+                // 3. Parse and validate JSON structure
+                const { medicalAnalysisText, ivdRecommendations } = data;
+                
                 if (!medicalAnalysisText || !ivdRecommendations || !Array.isArray(ivdRecommendations)) {
-                     throw new Error("Missing expected fields in AI response JSON.");
+                     throw new Error("AI response format error: Missing expected fields or ivdRecommendations is not an array.");
                 }
-
 
                 // 4. Populate results
                 document.getElementById('medical-analysis-content').textContent = medicalAnalysisText;
@@ -311,7 +276,7 @@
                 ivdRecommendations.forEach(item => {
                     const li = document.createElement('li');
                     li.textContent = item;
-                    li.className = 'text-gray-700';
+                    li.className = 'ml-4'; // Add some left margin for better list display
                     ivdListElement.appendChild(li);
                 });
 
@@ -323,17 +288,12 @@
                 console.error("Analysis Error:", error);
                 document.getElementById('medical-analysis-content').textContent = '';
                 document.getElementById('ivd-recommendations-list').innerHTML = '';
-                // Check if the error is a 502 and use the specific translation
-                const errorMessage = error.message;
-                if (errorMessage.includes('502')) {
-                    showError('apiError', '502'); // Trigger 502 specific message
-                } else {
-                    showError('apiError', errorMessage); 
-                }
+                // Use the new, detailed error message
+                showError('apiError', error.message.substring(0, 200)); 
             } finally {
                 // 6. Final cleanup
-                analyzeButton.disabled = false;
                 loading.classList.add('hidden');
+                analyzeButton.disabled = false;
             }
         }
 
