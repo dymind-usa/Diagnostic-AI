@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 诊断检测专家系统</title>
+    <!-- 引入 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 强制使用 Inter 字体，提供更好的可读性 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* 隐藏加载时的占位符，直到 JS 完成初始化 */
+        [data-i18n]:empty {
+            min-width: 50px; /* 避免布局晃动 */
+            min-height: 1.5em;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
+        <!-- Header and Language Selector -->
+        <header class="mb-8 border-b pb-4 flex justify-between items-center">
+            <!-- 1. Patient Information Input -> Patient Data Input -->
+            <h1 class="text-3xl font-bold text-gray-800" data-i18n="appTitle">AI 诊断检测专家系统</h1>
+            
+            <!-- Language Selector -->
+            <div class="flex items-center space-x-2">
+                <label for="language-select" class="text-sm font-medium text-gray-600" data-i18n="languageLabel">语言:</label>
+                <select id="language-select" class="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                    <option value="zh">中文 (Chinese)</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Input Section -->
+        <section id="input-section" class="mb-8 p-6 bg-indigo-50 rounded-lg border border-indigo-200">
+            <!-- 1. Patient Information Input -> Patient Data Input -->
+            <h2 class="text-2xl font-semibold mb-4 text-indigo-800" data-i18n="inputSectionTitle">患者数据输入</h2>
+            
+            <!-- 2. Demo Cases -> Case Studies -->
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-indigo-700 mb-2" data-i18n="demoCasesTitle">案例研究:</h3>
+                <div id="demo-buttons" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case1" data-i18n="case1Button" onclick="loadDemoCase('case1')">案例 1</button>
+                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case2" data-i18n="case2Button" onclick="loadDemoCase('case2')">案例 2</button>
+                    <button type="button" class="py-2 px-3 bg-indigo-400 text-white font-medium rounded-lg hover:bg-indigo-500 transition duration-150 text-sm shadow-md" data-case="case3" data-i18n="case3Button" onclick="loadDemoCase('case3')">案例 3</button>
+                </div>
+            </div>
+
+            <!-- 3. Department/Other information -> Department/Additional information -->
+            <div class="mb-4">
+                <label for="department" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="departmentLabel">科室/附加信息:</label>
+                <input type="text" id="department" placeholder="e.g., Cardiology / History of diabetes, 内科 / 长期素食" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+            </div>
+
+            <!-- 4. Symptoms/Patient complaint -> Patient symptoms/signs/statements -->
+            <div class="mb-4">
+                <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="symptomsLabel">患者症状/体征/主诉:</label>
+                <textarea id="symptoms" rows="4" placeholder="e.g., Fever for 3 days, cough with phlegm, 持续发烧，乏力" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"></textarea>
+            </div>
+
+            <!-- 5. Existing Test Results/History -> Clinical History and test results -->
+            <div class="mb-6">
+                <label for="test-results" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="testResultsLabel">临床病史和检测结果:</label>
+                <textarea id="test-results" rows="3" placeholder="e.g., CRP 50 mg/L, WBC 15.2 x 10^9/L, 血常规，过敏史" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"></textarea>
+            </div>
+            
+            <button id="analyze-button" class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200 shadow-md" onclick="runAnalysis()" data-i18n="analyzeButton">运行 AI 分析</button>
+        </section>
+
+        <!-- Output/Results Section -->
+        <section id="output-section" class="p-6 bg-white rounded-lg border border-gray-300">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800" data-i18n="outputSectionTitle">AI 分析与建议</h2>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden text-center p-4">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
+                <p class="mt-2 text-indigo-600 font-medium" data-i18n="loadingMessage">正在分析复杂的医疗数据...</p>
+            </div>
+
+            <!-- Results Display -->
+            <div id="results-display" class="space-y-6 hidden">
+                <!-- Medical Analysis Card -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="text-xl font-medium text-gray-700 mb-2 border-b pb-1" data-i18n="medicalAnalysisTitle">医学分析:</h3>
+                    <p id="medical-analysis-content" class="text-gray-600 whitespace-pre-line">...</p>
+                </div>
+
+                <!-- IVD Recommendations Card -->
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="text-xl font-medium text-yellow-800 mb-2 border-b pb-1" data-i18n="ivdRecommendationsTitle">建议的 IVD 检测项目:</h3>
+                    <ul id="ivd-recommendations-list" class="list-disc list-inside text-yellow-700 space-y-1 pl-4">
+                        <li>...</li>
+                    </ul>
+                </div>
+
+                <!-- Disclaimer -->
+                <p class="text-sm text-red-500 mt-4 p-3 bg-red-100 rounded-lg" data-i18n="disclaimer">
+                    免责声明：这是一个AI诊断辅助工具，不应取代专业的医学判断。请咨询合格医师以获得最终诊断和治疗决定。
+                </p>
+            </div>
+
+            <!-- No Results Placeholder -->
+            <p id="no-results" class="text-gray-500 p-4 text-center" data-i18n="noResultsMessage">
+                请输入患者数据并点击“运行 AI 分析”以查看结果。
+            </p>
+
+            <!-- Error Message Box -->
+            <div id="error-box" class="hidden p-4 mt-4 bg-red-100 border border-red-400 text-red-700 rounded-lg" role="alert">
+                <p data-i18n="errorMessagePrefix">错误: </p>
+                <p id="error-message-content" class="font-medium"></p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- Multilingual Dictionary (i18n) ---
+        const translations = {
+            appTitle: {
+                en: "AI Diagnostic Test Expert System",
+                zh: "AI 诊断检测专家系统",
+                es: "Sistema Experto de Diagnóstico por IA"
+            },
+            languageLabel: {
+                en: "Language:",
+                zh: "语言:",
+                es: "Idioma:"
+            },
+            // 1. Patient Information Input -> Patient Data Input
+            inputSectionTitle: {
+                en: "Patient Data Input",
+                zh: "患者数据输入",
+                es: "Entrada de Datos del Paciente"
+            },
+            
+            // 3. Department/Other information -> Department/Additional information
+            departmentLabel: { 
+                en: "Department/Additional information:",
+                zh: "科室/附加信息:",
+                es: "Departamento/Información Adicional:"
+            },
+            // 4. Symptoms/Patient complaint -> Patient symptoms/signs/statements
+            symptomsLabel: {
+                en: "Patient symptoms/signs/statements:",
+                zh: "患者症状/体征/主诉:",
+                es: "Síntomas/Signos/Declaraciones del Paciente:"
+            },
+            // 5. Existing Test Results/History -> Clinical History and test results
+            testResultsLabel: { 
+                en: "Clinical History and test results:",
+                zh: "临床病史和检测结果:",
+                es: "Historial Clínico y resultados de pruebas:"
+            },
+            
+            analyzeButton: {
+                en: "Run AI Analysis",
+                zh: "运行 AI 分析",
+                es: "Ejecutar Análisis de IA"
+            },
+            outputSectionTitle: {
+                en: "AI Analysis and Recommendations",
+                zh: "AI 分析与建议",
+                es: "Análisis y Recomendaciones de IA"
+            },
+            loadingMessage: {
+                en: "Analyzing complex medical data...",
+                zh: "正在分析复杂的医疗数据...",
+                es: "Analizando datos médicos complejos..."
+            },
+            medicalAnalysisTitle: {
+                en: "Medical Analysis:",
+                zh: "医学分析:",
+                es: "Análisis Médico:"
+            },
+            ivdRecommendationsTitle: {
+                en: "Suggested IVD Tests:",
+                zh: "建议的 IVD 检测项目:",
+                es: "Pruebas IVD Sugeridas:"
+            },
+            disclaimer: {
+                en: "Disclaimer: This is an AI diagnostic aid and should not replace professional medical judgment. Consult a qualified physician for final diagnosis and treatment decisions.",
+                zh: "免责声明：这是一个AI诊断辅助工具，不应取代专业的医学判断。请咨询合格医师以获得最终诊断和治疗决定。",
+                es: "Descargo de responsabilidad: Esta es una ayuda diagnóstica de IA y no debe reemplazar el juicio médico profesional. Consulte a un médico calificado para el diagnóstico y las decisiones de tratamiento finales."
+            },
+            noResultsMessage: {
+                en: "Please enter patient data and click \"Run AI Analysis\" to view results.",
+                zh: "请输入患者数据并点击“运行 AI 分析”以查看结果。",
+                es: "Por favor, introduzca los datos del paciente y haga clic en \"Ejecutar Análisis de IA\" para ver los resultados."
+            },
+            errorMessagePrefix: {
+                en: "Error: ",
+                zh: "错误: ",
+                es: "Error: "
+            },
+            emptyInputError: {
+                en: "Please provide either symptoms or clinical history/test results to start the analysis.",
+                zh: "请输入症状或临床病史/现有检测结果以开始分析。",
+                es: "Por favor, proporcione síntomas o historial clínico/resultados de pruebas para iniciar el análisis."
+            },
+            apiError: {
+                en: "AI analysis failed. Please check the inputs or try again later.",
+                zh: "AI 分析失败。请检查输入内容或稍后重试。",
+                es: "El análisis de IA falló. Por favor, revise las entradas o inténtelo de nuevo más tarde."
+            },
+            apiKeyError: {
+                en: "API Key is missing or invalid. Please check your OpenAI API key.",
+                zh: "API 密钥缺失或无效。请检查您的 OpenAI API 密钥。",
+                es: "La clave API falta o no es válida. Por favor, revise su clave API de OpenAI."
+            },
+            // 2. Demo Cases -> Case Studies
+            demoCasesTitle: {
+                en: "Case Studies:",
+                zh: "案例研究:",
+                es: "Estudios de Caso:"
+            },
+            case1Button: {
+                en: "Case 1: Anemia",
+                zh: "案例 1: 贫血",
+                es: "Caso 1: Anemia"
+            },
+            case2Button: {
+                en: "Case 2: Malaria",
+                zh: "案例 2: 疟疾",
+                es: "Caso 2: Malaria"
+            },
+            case3Button: {
+                en: "Case 3: Leukemia",
+                zh: "案例 3: 白血病",
+                es: "Caso 3: Leucemia"
+            }
+        };
+
+        // --- Demo Case Data (No change to data values, only labels above) ---
+        const demoCases = {
+            case1: {
+                zh: {
+                    department: "内科",
+                    symptoms: "乏力，头晕，面色苍白",
+                    tests_done: "HGB降低，MCH降低，RDW升高，血清铁降低",
+                    other_info: "长期素食"
+                },
+                en: {
+                    department: "Internal Medicine",
+                    symptoms: "Fatigue, dizziness, pale complexion",
+                    tests_done: "Low HGB, low MCH, high RDW, low serum iron",
+                    other_info: "Long-term vegetarian diet"
+                },
+                es: {
+                    department: "Medicina Interna",
+                    symptoms: "Fatiga, mareos, tez pálida",
+                    tests_done: "HGB bajo, MCH bajo, RDW alto, hierro sérico bajo",
+                    other_info: "Dieta vegetariana a largo plazo"
+                }
+            },
+            case2: {
+                zh: {
+                    department: "感染科",
+                    symptoms: "发热，寒战，出汗",
+                    tests_done: "（暂无）",
+                    other_info: "近期旅行史：印度"
+                },
+                en: {
+                    department: "Infectious Diseases",
+                    symptoms: "Fever, chills, sweating",
+                    tests_done: "No existing tests",
+                    other_info: "Recent travel history: India"
+                },
+                es: {
+                    department: "Enfermedades Infecciosas",
+                    symptoms: "Fiebre, escalofríos, sudoración",
+                    tests_done: "No hay pruebas existentes",
+                    other_info: "Historial de viajes recientes: India"
+                }
+            },
+            case3: {
+                zh: {
+                    department: "血液科",
+                    symptoms: "乏力，出血点，牙龈出血",
+                    tests_done: "血常规：白细胞升高，血小板降低，HGB降低，原始细胞*",
+                    other_info: "多次转院未确诊"
+                },
+                en: {
+                    department: "Hematology",
+                    symptoms: "Fatigue, petechiae, gum bleeding",
+                    tests_done: "CBC: High WBC, low platelet, low HGB, blast cells*",
+                    other_info: "Multiple hospital transfers without confirmed diagnosis"
+                },
+                es: {
+                    department: "Hematología",
+                    symptoms: "Fatiga, petequias, sangrado de encías",
+                    tests_done: "CBC: Leucocitos altos, plaquetas bajas, HGB bajo, células blásticas*",
+                    other_info: "Múltiples traslados hospitalarios sin diagnóstico confirmado"
+                }
+            }
+        };
+
+
+        let currentLang = 'zh'; // Default language
+        let lastLoadedCaseKey = null; // New: Tracks the last loaded demo case key
+        
+        // IMPORTANT: Replace the empty string below with your actual ChatGPT/OpenAI API Key
+        // IMPORTANT: 请将下面的空字符串替换为您的实际 ChatGPT/OpenAI API 密钥
+        const apiKey = "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"; 
+        const apiUrl = "https://api.openai.com/v1/chat/completions";
+        const openAIModel = "gpt-4o-mini"; // Using a modern model that supports JSON output reliably
+
+        /**
+         * Retries a fetch request with exponential backoff.
+         */
+        async function fetchWithRetry(url, options, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+                    if (response.status === 429 && i < retries - 1) { // Too Many Requests
+                        const delay = Math.pow(2, i) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+                    // For non-429 errors, throw immediately to get the error message
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error?.message || `API request failed with status: ${response.status}`);
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    const delay = Math.pow(2, i) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+
+        /**
+         * Updates all UI elements with the text corresponding to the current language.
+         */
+        function updateText() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[key] && translations[key][currentLang]) {
+                    element.textContent = translations[key][currentLang];
+                }
+            });
+            // Update demo case button texts
+            document.querySelectorAll('#demo-buttons button').forEach(button => {
+                const caseKey = button.getAttribute('data-case');
+                // Use the translated button text (which includes the case name/topic)
+                button.textContent = translations[`${caseKey}Button`][currentLang];
+            });
+
+
+            // Ensure the select element itself shows the correct language *after* loading
+            const langSelect = document.getElementById('language-select');
+            if (langSelect.value !== currentLang) {
+                // This ensures the selected option in the dropdown matches the active language
+                langSelect.value = currentLang;
+            }
+        }
+
+        /**
+         * Initializes the language setting and attaches the change listener.
+         */
+        function initializeLanguage() {
+            const storedLang = localStorage.getItem('aiDiagnosticLang');
+            const langSelect = document.getElementById('language-select');
+
+            if (storedLang && ['zh', 'en', 'es'].includes(storedLang)) {
+                currentLang = storedLang;
+            } else {
+                // Try to infer from browser or default to Chinese
+                const browserLang = navigator.language.substring(0, 2);
+                if (browserLang === 'en') currentLang = 'en';
+                else if (browserLang === 'es') currentLang = 'es';
+                else currentLang = 'zh';
+            }
+
+            langSelect.value = currentLang;
+            updateText(); // Initial translation load
+
+            langSelect.addEventListener('change', (event) => {
+                currentLang = event.target.value;
+                localStorage.setItem('aiDiagnosticLang', currentLang);
+                updateText();
+                
+                // When language changes, clear results
+                clearResults(); 
+                
+                // NEW LOGIC: If a demo case was previously loaded, re-load it to update inputs
+                if (lastLoadedCaseKey) {
+                    loadDemoCase(lastLoadedCaseKey);
+                }
+            });
+        }
+        
+        /**
+         * Clears only the results display and error messages.
+         */
+        function clearResults() {
+            document.getElementById('results-display').classList.add('hidden');
+            document.getElementById('medical-analysis-content').textContent = '...';
+            document.getElementById('ivd-recommendations-list').innerHTML = '';
+            document.getElementById('no-results').classList.remove('hidden');
+            document.getElementById('error-box').classList.add('hidden');
+        }
+
+        /**
+         * Loads a predefined demo case into the input fields.
+         * @param {string} caseKey - The key of the demo case (e.g., 'case1').
+         */
+        function loadDemoCase(caseKey) {
+            clearResults();
+            const caseData = demoCases[caseKey]?.[currentLang] || demoCases[caseKey]?.['zh'];
+            
+            if (caseData) {
+                document.getElementById('symptoms').value = caseData.symptoms;
+                document.getElementById('test-results').value = caseData.tests_done;
+                
+                // Combine department and other info into the Department/Other information field
+                let deptValue = caseData.department;
+                if (caseData.other_info && caseData.other_info !== '（暂无）' && !caseData.other_info.toLowerCase().includes('no')) {
+                    deptValue += (caseData.department ? ' / ' : '') + caseData.other_info;
+                }
+                document.getElementById('department').value = deptValue;
+
+                // Set the tracking key after successful load
+                lastLoadedCaseKey = caseKey;
+
+                // Scroll to the input section
+                document.getElementById('input-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        /**
+         * Shows the error message box with translated content.
+         * @param {string} errorKey - The key for the error message in the translations object.
+         * @param {string} [details=''] - Optional error details to append.
+         */
+        function showError(errorKey, details = '') {
+            const errorBox = document.getElementById('error-box');
+            const errorContent = document.getElementById('error-message-content');
+            const errorPrefix = document.querySelector('#error-box p[data-i18n="errorMessagePrefix"]');
+
+            errorPrefix.textContent = translations['errorMessagePrefix'][currentLang];
+            errorContent.textContent = (translations[errorKey][currentLang] || translations['apiError'][currentLang]) + (details ? ` (${details})` : '');
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('results-display').classList.add('hidden');
+            document.getElementById('no-results').classList.add('hidden');
+            errorBox.classList.remove('hidden');
+        }
+        
+        /**
+         * Main function to perform AI analysis via OpenAI API.
+         */
+        async function runAnalysis() {
+            // Reset the demo tracking key when analysis starts (as inputs might have been modified)
+            lastLoadedCaseKey = null;
+
+            const symptoms = document.getElementById('symptoms').value.trim();
+            const results = document.getElementById('test-results').value.trim();
+            const department = document.getElementById('department').value.trim();
+            
+            const resultsDisplay = document.getElementById('results-display');
+            const loading = document.getElementById('loading');
+            const analyzeButton = document.getElementById('analyze-button');
+            
+            // 1. Pre-analysis setup
+            clearResults();
+
+            if (!symptoms && !results) {
+                showError('emptyInputError');
+                return;
+            }
+
+            if (!apiKey) {
+                showError('apiKeyError');
+                return;
+            }
+            
+            loading.classList.remove('hidden');
+            analyzeButton.disabled = true;
+
+            // 2. Construct Prompt and Payload (OpenAI format)
+            const systemPrompt = `Act as a highly experienced medical diagnostic assistant. Your task is to provide a concise medical analysis and a list of 3 to 5 essential In-Vitro Diagnostic (IVD) tests based on the patient information provided. The output MUST be in the language requested by the user. Do not include disclaimers or any text outside of the JSON object. You MUST respond only with a JSON object that strictly follows this schema: {"medical_analysis": "...", "suggested_ivd_tests": ["...", "..."]}.`;
+
+            const userQuery = `Patient Data to analyze:
+- Department/Other Information: ${department || 'Not specified'}
+- Symptoms/Patient Complaint: ${symptoms}
+- Existing Test Results/History: ${results || 'None'}
+- Response Language: ${currentLang}
+`;
+            
+            const payload = {
+                model: openAIModel,
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userQuery }
+                ],
+                response_format: { type: "json_object" }
+            };
+
+            const fetchOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Use the OpenAI key as a Bearer token
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(payload)
+            };
+            
+            // 3. Execute API Call
+            try {
+                const response = await fetchWithRetry(apiUrl, fetchOptions);
+                
+                const result = await response.json();
+                
+                // Extraction logic for OpenAI response: choices[0].message.content
+                const jsonText = result.choices?.[0]?.message?.content;
+
+                if (!jsonText) {
+                    // Check for potential API error message in the result object
+                    const apiError = result.error?.message || "Empty or invalid response from AI model.";
+                    throw new Error(apiError);
+                }
+
+                // Parse the structured JSON response
+                const parsedJson = JSON.parse(jsonText);
+                
+                const medicalAnalysisText = parsedJson.medical_analysis;
+                const ivdRecommendations = parsedJson.suggested_ivd_tests;
+
+                if (!medicalAnalysisText || !ivdRecommendations) {
+                     throw new Error("Missing expected fields in AI response JSON.");
+                }
+
+
+                // 4. Populate results
+                document.getElementById('medical-analysis-content').textContent = medicalAnalysisText;
+                
+                const ivdListElement = document.getElementById('ivd-recommendations-list');
+                ivdListElement.innerHTML = ''; // Clear old list
+                ivdRecommendations.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    ivdListElement.appendChild(li);
+                });
+
+                // 5. Display results
+                loading.classList.add('hidden');
+                resultsDisplay.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Analysis Error:", error);
+                document.getElementById('medical-analysis-content').textContent = '';
+                document.getElementById('ivd-recommendations-list').innerHTML = '';
+                // Use a general API error message
+                showError('apiError', error.message.substring(0, 100)); 
+            } finally {
+                // 6. Final cleanup
+                analyzeButton.disabled = false;
+            }
+        }
+
+        window.onload = initializeLanguage;
+    </script>
+</body>
+</html>
